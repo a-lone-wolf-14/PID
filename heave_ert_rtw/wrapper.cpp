@@ -5,6 +5,8 @@
 
 namespace py = pybind11;
 
+using namespace pybind11::literals;
+
 PYBIND11_MODULE(heave_rt, m)
 {
     py::class_<heave>(m, "Heave")
