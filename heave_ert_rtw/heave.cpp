@@ -26,6 +26,10 @@ void heave::step()                     // Sample time: [0.001s, 0.0s]
 // Model step function for TID1
 void heave::step1()                    // Sample time: [0.01s, 0.0s]
 {
+  float Kp = 876.859951030588;
+  float Ki = 464.069533746115;
+  float Kd = 404.881844274437;
+  float filter_coeff = 175.900303588767;
   real_T rtb_FilterCoefficient;
   real_T rtb_Gain;
   real_T rtb_Subtract;
@@ -42,15 +46,15 @@ void heave::step1()                    // Sample time: [0.01s, 0.0s]
   //   Gain: '<S31>/Derivative Gain'
   //   Sum: '<S33>/SumD'
 
-  rtb_FilterCoefficient = (404.881844274437 * rtb_Subtract - rtDW.Filter_DSTATE)
-    * 175.900303588767;
+  rtb_FilterCoefficient = (Kd * rtb_Subtract - rtDW.Filter_DSTATE)
+    * filter_coeff; //Kd
 
   // Sum: '<S47>/Sum' incorporates:
   //   DiscreteIntegrator: '<S38>/Integrator'
   //   Gain: '<S43>/Proportional Gain'
 
-  rtb_Sum = (876.859951030588 * rtb_Subtract + rtDW.Integrator_DSTATE) +
-    rtb_FilterCoefficient;
+  rtb_Sum = (Kp * rtb_Subtract + rtDW.Integrator_DSTATE) +
+    rtb_FilterCoefficient;  //Kp
 
   // Saturate: '<Root>/Saturation'
   if (rtb_Sum > 263.8) {
@@ -83,8 +87,8 @@ void heave::step1()                    // Sample time: [0.01s, 0.0s]
   //   Sum: '<S30>/SumI2'
   //   Sum: '<S30>/SumI4'
 
-  rtDW.Integrator_DSTATE += ((rtb_Sum - rtb_Sum) + 464.069533746115 *
-    rtb_Subtract) * 0.01;
+  rtDW.Integrator_DSTATE += ((rtb_Sum - rtb_Sum) + Ki *
+    rtb_Subtract) * 0.01; //Ki
 
   // Update for DiscreteIntegrator: '<S33>/Filter'
   rtDW.Filter_DSTATE += 0.01 * rtb_FilterCoefficient;

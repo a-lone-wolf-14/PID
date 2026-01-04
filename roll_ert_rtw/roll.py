@@ -3,10 +3,12 @@ import math
 import pandas as pd
 import numpy as np
 from scipy.interpolate import interp1d
-
+import sys
+sys.path.append("../heave_ert_rtw")
 from vectornav import Sensor, Registers
 from roll_ctrl import RollController   # ✅ CORRECT MODULE
-
+from heave_rt import Heave
+import serial
 # ================= OFFSETS =================
 OFFSET_ROLL = 0.0
 OFFSET_P = 0.0
@@ -14,6 +16,7 @@ offset_set = False
 
 # ================= CONFIG =================
 PORT = "/dev/ttyUSB0"
+INPUT = "/dev/ttyS4"
 OUT = "/dev/ttyS4"
 BAUD = 115200
 
@@ -59,7 +62,6 @@ thrust_interp_voltage = [
     for i in range(len(PWM))
 ]
 
-
 def thrust_at_voltage(voltage):
     return np.array([f(voltage) for f in thrust_interp_voltage])
 
@@ -81,6 +83,13 @@ def thrust_to_pwm(desired_thrust, voltage):
 
     pwm = float(pwm_interp(desired_thrust))
     return int(np.clip(pwm, PWM_MIN, PWM_MAX))
+
+def parse_ptd(line):
+    try:
+        p, t, d = map(float, line.split("/"))
+        return p, t, d
+    except Exception:
+        return None
 
 
 # ================= IMU =================
@@ -130,7 +139,21 @@ def main():
                         f"P={OFFSET_P:.3f} rad/s"
                     )
                     continue
+                line = ser2.readline().decode("ascii", errors="ignore").strip()
+                if not line:
+                    continue
+                
+                data = parse_ptd(line)
+                if data is None:
+                    continue
+                pressure, temperature, depth = data
 
+                heave_pid.set_inputs(0.5,depth)
+                heave_pid.step()
+                heave_pid.step1()
+                out_heave = heave_pid.outputs()
+
+                T_heave = (out_heave["FL"] + out_heave["FR"] + out_heave["BL"] + out_heave["BR"])/4.0
                 t0 = time.time()
 
                 # ---- IMU ----
@@ -145,7 +168,7 @@ def main():
                         ROLL_GOAL,
                         roll_rel,
                         p_rel,
-                        0.0       # heave input (set to 0 unless coupled)
+                        T_heave       # heave input (set to 0 unless coupled)
                     )
 
                     # Wrapper handles 1 kHz base + 100 Hz subrate internally

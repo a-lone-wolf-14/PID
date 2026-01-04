@@ -98,7 +98,6 @@ def main():
 
     with open(LOG_FILE, "w") as log:
         log.write("Depth,Pressure,Temperature,PWM_FL,PWM_FR,PWM_BL,PWM_BR\n")
-
         last_time = time.time()
 
         pwm = {"FL": 1500, "FR": 1500, "BL": 1500, "BR": 1500}
