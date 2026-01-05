@@ -4,21 +4,21 @@
 #include "heave.h"
 
 namespace py = pybind11;
-
 using namespace pybind11::literals;
 
 PYBIND11_MODULE(heave_rt, m)
 {
+    // =================== Heave Model Class ===================
     py::class_<heave>(m, "Heave")
         .def(py::init<>())
 
-        // ===== lifecycle =====
-        .def("initialize", &heave::initialize)
-        .def("step", &heave::step)     // base rate (1 kHz)
-        .def("step1", &heave::step1)   // subrate (100 Hz)
+        // ======= step functions (INSTANCE) =======
+        .def("step", &heave::step)     // base rate
+        .def("step1", &heave::step1)   // subrate
 
-        // ===== inputs =====
-        .def("set_inputs",
+        // ======= inputs =======
+        .def(
+            "set_inputs",
             [](heave &self, double depth_goal, double depth)
             {
                 self.rtU.depth_goal = depth_goal;
@@ -28,8 +28,9 @@ PYBIND11_MODULE(heave_rt, m)
             py::arg("depth")
         )
 
-        // ===== outputs =====
-        .def("outputs",
+        // ======= outputs =======
+        .def(
+            "outputs",
             [](heave &self)
             {
                 return py::dict(
@@ -40,4 +41,9 @@ PYBIND11_MODULE(heave_rt, m)
                 );
             }
         );
+
+    // =================== STATIC lifecycle ===================
+    // Simulink ERT: initialize() is STATIC → module-level
+    m.def("initialize", &heave::initialize, "Initialize the heave model");
 }
+

@@ -26,10 +26,10 @@ void heave::step()                     // Sample time: [0.001s, 0.0s]
 // Model step function for TID1
 void heave::step1()                    // Sample time: [0.01s, 0.0s]
 {
-  float Kp = 876.859951030588;
-  float Ki = 464.069533746115;
-  float Kd = 404.881844274437;
-  float filter_coeff = 175.900303588767;
+  float Kp = 35.859951030588;
+  float Ki = 0.15;
+  float Kd = 0.00001;
+  float filter_coeff = 100.900303588767;
   real_T rtb_FilterCoefficient;
   real_T rtb_Gain;
   real_T rtb_Subtract;
