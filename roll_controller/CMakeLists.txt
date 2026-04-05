@@ -6,6 +6,7 @@ find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 # ✅ FIRST define target
 add_executable(roll_node
@@ -18,6 +19,8 @@ target_include_directories(roll_node PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/ert_rtw
 )
+
+target_link_libraries(roll_node yaml-cpp)
 
 # ✅ dependencies
 ament_target_dependencies(roll_node
