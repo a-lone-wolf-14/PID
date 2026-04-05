@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'roll'.
 //
-// Model version                  : 1.10
+// Model version                  : 1.11
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Sat Apr  4 20:04:06 2026
+// C/C++ source code generated on : Sun Apr  5 18:33:48 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: Intel->x86-64 (Linux 64)
@@ -41,6 +41,12 @@ class roll final
     real_T roll_goal;                  // '<Root>/roll_goal'
     real_T roll_p;                     // '<Root>/roll'
     real_T omega_x;                    // '<Root>/omega_x'
+    real_T pi_kp;                      // '<Root>/pi_kp'
+    real_T pi_ki;                      // '<Root>/pi_ki'
+    real_T pid_kp;                     // '<Root>/pid_kp'
+    real_T pid_ki;                     // '<Root>/pid_ki'
+    real_T pid_kd;                     // '<Root>/pid_kd'
+    real_T pid_kn;                     // '<Root>/pid_kn'
   };
 
   // External outputs (root outports fed by signals with default storage)
@@ -91,7 +97,6 @@ class roll final
 //  These blocks were eliminated from the model due to optimizations:
 //
 //  Block '<S30>/Kb' : Eliminated nontunable gain of 1
-//  Block '<S43>/Proportional Gain' : Eliminated nontunable gain of 1
 //  Block '<S82>/Kb' : Eliminated nontunable gain of 1
 
 
@@ -144,7 +149,7 @@ class roll final
 //  '<S32>'  : 'roll/PI/External Derivative/Disabled'
 //  '<S33>'  : 'roll/PI/Filter/Disabled'
 //  '<S34>'  : 'roll/PI/Filter ICs/Disabled'
-//  '<S35>'  : 'roll/PI/I Gain/Internal Parameters'
+//  '<S35>'  : 'roll/PI/I Gain/External Parameters'
 //  '<S36>'  : 'roll/PI/Ideal P Gain/Passthrough'
 //  '<S37>'  : 'roll/PI/Ideal P Gain Fdbk/Disabled'
 //  '<S38>'  : 'roll/PI/Integrator/Discrete'
@@ -152,7 +157,7 @@ class roll final
 //  '<S40>'  : 'roll/PI/N Copy/Disabled wSignal Specification'
 //  '<S41>'  : 'roll/PI/N Gain/Disabled'
 //  '<S42>'  : 'roll/PI/P Copy/Disabled'
-//  '<S43>'  : 'roll/PI/Parallel P Gain/Internal Parameters'
+//  '<S43>'  : 'roll/PI/Parallel P Gain/External Parameters'
 //  '<S44>'  : 'roll/PI/Reset Signal/Disabled'
 //  '<S45>'  : 'roll/PI/Saturation/Enabled'
 //  '<S46>'  : 'roll/PI/Saturation Fdbk/Disabled'
@@ -192,19 +197,19 @@ class roll final
 //  '<S80>'  : 'roll/PID Controller/preInt Signal'
 //  '<S81>'  : 'roll/PID Controller/preSat Signal'
 //  '<S82>'  : 'roll/PID Controller/Anti-windup/Back Calculation'
-//  '<S83>'  : 'roll/PID Controller/D Gain/Internal Parameters'
+//  '<S83>'  : 'roll/PID Controller/D Gain/External Parameters'
 //  '<S84>'  : 'roll/PID Controller/External Derivative/Error'
 //  '<S85>'  : 'roll/PID Controller/Filter/Disc. Forward Euler Filter'
 //  '<S86>'  : 'roll/PID Controller/Filter ICs/Internal IC - Filter'
-//  '<S87>'  : 'roll/PID Controller/I Gain/Internal Parameters'
+//  '<S87>'  : 'roll/PID Controller/I Gain/External Parameters'
 //  '<S88>'  : 'roll/PID Controller/Ideal P Gain/Passthrough'
 //  '<S89>'  : 'roll/PID Controller/Ideal P Gain Fdbk/Disabled'
 //  '<S90>'  : 'roll/PID Controller/Integrator/Discrete'
 //  '<S91>'  : 'roll/PID Controller/Integrator ICs/Internal IC'
 //  '<S92>'  : 'roll/PID Controller/N Copy/Disabled'
-//  '<S93>'  : 'roll/PID Controller/N Gain/Internal Parameters'
+//  '<S93>'  : 'roll/PID Controller/N Gain/External Parameters'
 //  '<S94>'  : 'roll/PID Controller/P Copy/Disabled'
-//  '<S95>'  : 'roll/PID Controller/Parallel P Gain/Internal Parameters'
+//  '<S95>'  : 'roll/PID Controller/Parallel P Gain/External Parameters'
 //  '<S96>'  : 'roll/PID Controller/Reset Signal/Disabled'
 //  '<S97>'  : 'roll/PID Controller/Saturation/Enabled'
 //  '<S98>'  : 'roll/PID Controller/Saturation Fdbk/Disabled'

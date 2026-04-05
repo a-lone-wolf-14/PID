@@ -130,6 +130,47 @@ public:
             "/imu/data", 10,
             std::bind(&RollNode::imu_callback, this, _1));
 
+        //Subscriber: PI gains
+        pi_kp_sub_ = create_subscription<std_msgs::msg::Float64>(
+            "/roll/pi/kp",10,
+            [this](std_msgs::msg::Float64::SharedPtr msg)
+            {
+                pi_kp_ = msg->data;
+            }
+        );
+
+        pi_ki_sub_ = create_subscription<std_msgs::msg::Float64>(
+            "/roll/pi/ki",10,
+            [this](std_msgs::msg::Float64::SharedPtr msg)
+            {
+                pi_ki_ = msg->data;
+            }
+        );
+
+        pid_kp_sub_ = create_subscription<std_msgs::msg::Float64>(
+            "/roll/pid/kp",10,
+            [this](std_msgs::msg::Float64::SharedPtr msg)
+            {
+                pid_kp_ = msg->data;
+            }
+        );
+
+        pid_kd_sub_ = create_subscription<std_msgs::msg::Float64>(
+            "/roll/pid/kd",10,
+            [this](std_msgs::msg::Float64::SharedPtr msg)
+            {
+                pid_kd_ = msg->data;
+            }
+        );
+
+        pid_kn_sub_ = create_subscription<std_msgs::msg::Float64>(
+            "/roll/pid/kn",10,
+            [this](std_msgs::msg::Float64::SharedPtr msg)
+            {
+                pid_kn_ = msg->data;
+            }
+        );
+
         // Publisher: thrusters
         thruster_pub_ = create_publisher<std_msgs::msg::Float64MultiArray>(
             "/thruster_cmd", 10);
@@ -146,7 +187,7 @@ public:
 
         mapper_.load_from_yaml("/config/T200.yaml");
 
-        double battery_voltage = 14.8;
+        battery_voltage_ = 14.8;
         roll_goal_ = 0.0;
     }
 
@@ -190,6 +231,12 @@ private:
         model_.rtU.roll_goal = roll_goal_;
         model_.rtU.roll_p    = roll_;
         model_.rtU.omega_x   = omega_x_;
+        model_.rtU.pi_kp = pi_kp_;
+        model_.rtU.pi_ki = pi_ki_;
+        model_.rtU.pid_kp = pid_kp_;
+        model_.rtU.pid_ki = pid_ki_;
+        model_.rtU.pid_kd = pid_kd_;
+        model_.rtU.pid_kn = pid_kn_;
 
         // Run controller
         model_.step();
@@ -226,8 +273,15 @@ private:
     double omega_x_ = 0.0;
     double roll_goal_;
     double battery_voltage_;
+    double pi_kp_ = 0.5;
+    double pi_ki_ = 0.1;
+    double pid_kp_ = 1.0;
+    double pid_ki_ = 0.0;
+    double pid_kd_ = 0.05;
+    double pid_kn_ = 10.0;
 
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub_;
+    rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr pi_kp_sub_,pi_ki_sub_,pid_kp_sub_,pid_ki_sub_,pid_kd_sub_,pid_kn_sub_;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr thruster_pub_,pwm_pub_;
     rclcpp::TimerBase::SharedPtr timer_;
 };

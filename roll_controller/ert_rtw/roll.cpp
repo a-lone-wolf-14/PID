@@ -7,9 +7,9 @@
 //
 // Code generated for Simulink model 'roll'.
 //
-// Model version                  : 1.10
+// Model version                  : 1.11
 // Simulink Coder version         : 25.2 (R2025b) 28-Jul-2025
-// C/C++ source code generated on : Sat Apr  4 20:04:06 2026
+// C/C++ source code generated on : Sun Apr  5 18:33:48 2026
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: Intel->x86-64 (Linux 64)
@@ -25,9 +25,9 @@
 void roll::step()
 {
   real_T rateLimiterRate;
-  real_T rtb_FilterCoefficient;
-  real_T rtb_IntegralGain;
+  real_T rtb_Filter;
   real_T rtb_Integrator_k;
+  real_T rtb_NProdOut;
   real_T rtb_Saturation;
   real_T rtb_Sum;
   real_T rtb_rate_err;
@@ -36,15 +36,14 @@ void roll::step()
   //   Inport: '<Root>/roll'
   //   Inport: '<Root>/roll_goal'
 
-  rtb_Integrator_k = rtU.roll_goal - rtU.roll_p;
-
-  // Gain: '<S35>/Integral Gain'
-  rtb_IntegralGain = 0.1 * rtb_Integrator_k;
+  rtb_Filter = rtU.roll_goal - rtU.roll_p;
 
   // Sum: '<S47>/Sum' incorporates:
   //   DiscreteIntegrator: '<S38>/Integrator'
+  //   Inport: '<Root>/pi_kp'
+  //   Product: '<S43>/PProd Out'
 
-  rtb_Integrator_k += rtDW.Integrator_DSTATE;
+  rtb_Integrator_k = rtb_Filter * rtU.pi_kp + rtDW.Integrator_DSTATE;
 
   // Saturate: '<S45>/Saturation'
   if (rtb_Integrator_k > 0.6) {
@@ -65,20 +64,22 @@ void roll::step()
 
   rtb_rate_err -= rtU.omega_x;
 
-  // Gain: '<S93>/Filter Coefficient' incorporates:
+  // Product: '<S93>/NProd Out' incorporates:
   //   DiscreteIntegrator: '<S85>/Filter'
-  //   Gain: '<S83>/Derivative Gain'
+  //   Inport: '<Root>/pid_kd'
+  //   Inport: '<Root>/pid_kn'
+  //   Product: '<S83>/DProd Out'
   //   Sum: '<S85>/SumD'
 
-  rtb_FilterCoefficient = (0.411399278827112 * rtb_rate_err - rtDW.Filter_DSTATE)
-    * 99.5946650002;
+  rtb_NProdOut = (rtb_rate_err * rtU.pid_kd - rtDW.Filter_DSTATE) * rtU.pid_kn;
 
   // Sum: '<S99>/Sum' incorporates:
   //   DiscreteIntegrator: '<S90>/Integrator'
-  //   Gain: '<S95>/Proportional Gain'
+  //   Inport: '<Root>/pid_kp'
+  //   Product: '<S95>/PProd Out'
 
-  rtb_Sum = (11.8622255037614 * rtb_rate_err + rtDW.Integrator_DSTATE_m) +
-    rtb_FilterCoefficient;
+  rtb_Sum = (rtb_rate_err * rtU.pid_kp + rtDW.Integrator_DSTATE_m) +
+    rtb_NProdOut;
 
   // Saturate: '<S97>/Saturation'
   if (rtb_Sum > 12.1) {
@@ -141,18 +142,21 @@ void roll::step()
   rtY.br = rtb_Saturation;
 
   // Update for DiscreteIntegrator: '<S38>/Integrator' incorporates:
+  //   Inport: '<Root>/pi_ki'
+  //   Product: '<S35>/IProd Out'
   //   Sum: '<S30>/SumI4'
 
-  rtDW.Integrator_DSTATE += (rtb_Integrator_k + rtb_IntegralGain) * 0.01;
+  rtDW.Integrator_DSTATE += (rtb_Filter * rtU.pi_ki + rtb_Integrator_k) * 0.01;
 
   // Update for DiscreteIntegrator: '<S90>/Integrator' incorporates:
-  //   Gain: '<S87>/Integral Gain'
+  //   Inport: '<Root>/pid_ki'
+  //   Product: '<S87>/IProd Out'
   //   Sum: '<S82>/SumI4'
 
-  rtDW.Integrator_DSTATE_m += (58.1740518423554 * rtb_rate_err + rtb_Sum) * 0.01;
+  rtDW.Integrator_DSTATE_m += (rtb_rate_err * rtU.pid_ki + rtb_Sum) * 0.01;
 
   // Update for DiscreteIntegrator: '<S85>/Filter'
-  rtDW.Filter_DSTATE += 0.01 * rtb_FilterCoefficient;
+  rtDW.Filter_DSTATE += 0.01 * rtb_NProdOut;
 }
 
 // Model initialize function
