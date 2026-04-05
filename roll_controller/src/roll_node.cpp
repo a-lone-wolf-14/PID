@@ -4,6 +4,8 @@
 #include <vector>
 #include <algorithm>
 #include <signal.h>
+#include <yaml-cpp/yaml.h>
+#include <set>
 
 #include "roll.h"
 
@@ -152,6 +154,14 @@ public:
             [this](std_msgs::msg::Float64::SharedPtr msg)
             {
                 pid_kp_ = msg->data;
+            }
+        );
+
+        pid_ki_sub_ = create_subscription<std_msgs::msg::Float64>(
+            "/roll/pid/ki",10,
+            [this](std_msgs::msg::Float64::SharedPtr msg)
+            {
+                pid_ki_ = msg->data;
             }
         );
 
